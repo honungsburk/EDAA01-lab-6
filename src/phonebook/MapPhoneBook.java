@@ -1,13 +1,15 @@
 package phonebook;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Created by ha8040we-s on 22/02/17.
  */
-public class MapPhoneBook implements PhoneBook {
+public class MapPhoneBook implements PhoneBook, Serializable{
 
     Map<String, Set<String>> phonebook;
+    private static final long serialVersionUID= 1L;
 
     public MapPhoneBook() {
         phonebook = new TreeMap<>();

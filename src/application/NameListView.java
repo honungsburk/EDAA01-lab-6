@@ -21,6 +21,8 @@ public class NameListView extends BorderPane {
 	private ObservableList<String> obsList;
 	private PhoneBook phoneBook;
 	private Button addNumberButton;
+	private Button removeNameButton;
+	private Button removeNumberButton;
 	private Label numbersLabel;
 	
 	/** Creates the list view for the names.Also creates buttons for adding/removing names/numbers.
@@ -45,14 +47,22 @@ public class NameListView extends BorderPane {
 		
 		Button addButton = new Button("Add");
 		addButton.setOnAction(e -> add());
+
+		removeNameButton = new Button("Remove");
+		removeNameButton.setOnAction(e -> remove());
+
+		removeNumberButton = new Button("Remove Number");
+		removeNameButton.setOnAction(e -> removeNumber());
 		
 		addNumberButton = new Button("Add number");
 		addNumberButton.setOnAction(e -> addNumber());
+
+
 		
 		HBox buttonBox = new HBox();
 		buttonBox.setSpacing(5);
 		buttonBox.setPadding(new Insets(10, 10, 10, 10));
-		buttonBox.getChildren().addAll(numbersLabel, addButton, addNumberButton);
+		buttonBox.getChildren().addAll(numbersLabel, addButton, addNumberButton, removeNameButton, removeNumberButton);
 		setBottom(buttonBox);
 
 		// The method change is called when a row in the list view is selected. 
@@ -62,6 +72,8 @@ public class NameListView extends BorderPane {
 				int index = listView.getSelectionModel().getSelectedIndex();
 				if (index != -1) {
 					addNumberButton.setDisable(false);
+					removeNameButton.setDisable(false);
+					removeNumberButton.setDisable(false);
 					numbersLabel.setText(newValue + " " + phoneBook.findNumbers(newValue));
 				} else {
 					numbersLabel.setText("");
@@ -78,6 +90,8 @@ public class NameListView extends BorderPane {
 	 */
 	public void clearSelection() {
 		addNumberButton.setDisable(true);
+		removeNameButton.setDisable(true);
+		removeNumberButton.setDisable(true);
 		numbersLabel.setText("");
 		listView.getSelectionModel().clearSelection();
 	}
@@ -148,5 +162,32 @@ public class NameListView extends BorderPane {
 			}	
 		}	
 	}
-	
+
+	private  void remove(){
+		int index = listView.getSelectionModel().getSelectedIndex();
+		if(index != -1){
+			String name = obsList.get(index);
+			if(Dialogs.confirmDialog("Remove", "", "Are you sure you want to remove " + name + "?")) {
+				phoneBook.remove(name);
+				obsList.setAll(phoneBook.names());
+				clearSelection();
+			}
+		} else {
+			Dialogs.alert("Remove", null, "Failed to remove name");
+		}
+	}
+
+	private void removeNumber(){
+		int index = listView.getSelectionModel().getSelectedIndex();
+		if(index != -1) {
+			String name = obsList.get(index);
+			Optional<String> result = Dialogs.oneInputDialog("Remove phone number from " + name, "Enter the number to remove", "Number" );
+			if(result.isPresent()){
+				phoneBook.removeNumber(name, result.get());
+				clearSelection();
+			}
+		} else {
+			Dialogs.alert("Remove", null, "Failed to remove number");
+		}
+	}
 }
